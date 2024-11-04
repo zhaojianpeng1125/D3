@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D3.js 数据变换示例</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        .container {
+            display: flex;
+            flex-direction: row; /* 水平排列 */
+            width: 100%;
+        }
+        .input-section {
+            width: 40%;
+            padding: 30px;
+            border-right: 2px solid #ccc;
+            box-sizing: border-box; /* 确保 padding 不影响宽度 */
+        }
+        .input-section h1 {
+            font-size: 32px;
+        }
+        .input-section p {
+            font-size: 20px;
+        }
+        .input-section label {
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .input-section input,
+        .input-section textarea {
+            font-size: 20px;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+        .input-section select {
+            width: 100%;
+            padding: 10px;
+            font-size: 20px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        .input-section button {
+            padding: 15px 20px;
+            margin: 10px 0;
+            font-size: 24px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .result-section {
+            width: 60%;
+            padding: 30px;
+            font-size: 40px; /* 原来是 20px，调整为两倍 */
+            box-sizing: border-box;
+        }
+        .result-section h2 {
+            font-size: 56px; /* 原来是 28px，调整为两倍 */
+            margin-bottom: 20px;
+        }
+        .result-section p {
+            font-size: 36px; /* 原来是 18px，调整为两倍 */
+            line-height: 1.6;
+            white-space: pre-wrap; /* 保留换行和空格 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 左侧输入区域 -->
+    <div class="input-section">
+        <h1>D3.js 数据变换方法示例</h1>
+        <p>选择一个函数并输入对应的数据来查看 D3 数据变换的结果。</p>
+
+        <!-- 选择函数的下拉框 -->
+        <label for="functionSelect">选择函数:</label>
+        <select id="functionSelect" onchange="updateInputFields()">
+            <option value="cross">d3.cross</option>
+            <option value="merge">d3.merge</option>
+            <option value="pairs">d3.pairs</option>
+            <option value="transpose">d3.transpose</option>
+            <option value="zip">d3.zip</option>
+            <option value="filter">d3.filter</option>
+            <option value="map">d3.map</option>
+            <option value="reduce">d3.reduce</option>
+        </select>
+
+        <!-- 动态生成输入框的区域 -->
+        <div id="inputFields">
+            <!-- 输入框将基于选择的函数动态生成 -->
+        </div>
+
+        <button onclick="showResult()">显示结果</button>
+    </div>
+
+    <!-- 右侧结果显示区域 -->
+    <div class="result-section" id="result">
+        <h2>结果显示</h2>
+        <p>点击左侧按钮查看数据变换的结果。</p>
+    </div>
+</div>
+
+<script>
+    function updateInputFields() {
+        const selectedFunction = document.getElementById("functionSelect").value;
+        const inputFieldsDiv = document.getElementById("inputFields");
+        inputFieldsDiv.innerHTML = ""; // 清空之前的输入框
+
+        if (selectedFunction === "cross") {
+            inputFieldsDiv.innerHTML += `<label for="inputArray1">数组 1:</label>
+                                        <input type="text" id="inputArray1" value="1,2,3" placeholder="例如：1,2,3"><br><br>
+                                        <label for="inputArray2">数组 2:</label>
+                                        <input type="text" id="inputArray2" value="a,b,c" placeholder="例如：a,b,c">`;
+        } else if (selectedFunction === "merge") {
+            inputFieldsDiv.innerHTML += `<label for="inputArrays">数组列表:</label>
+                                        <textarea id="inputArrays" placeholder="例如：[1,2,3],[4,5,6],[7,8,9]" rows="5">[1,2,3],[4,5,6],[7,8,9]</textarea>`;
+        } else if (selectedFunction === "pairs") {
+            inputFieldsDiv.innerHTML += `<label for="inputArray1">数组 1:</label>
+                                        <input type="text" id="inputArray1" value="1,2,3,4" placeholder="例如：1,2,3,4">`;
+        } else if (selectedFunction === "transpose") {
+            inputFieldsDiv.innerHTML += `<label for="inputArray1">数组 1:</label>
+                                        <input type="text" id="inputArray1" value="1,2,3" placeholder="例如：1,2,3"><br><br>
+                                        <label for="inputArray2">数组 2:</label>
+                                        <input type="text" id="inputArray2" value="4,5,6" placeholder="例如：4,5,6">`;
+        } else if (selectedFunction === "zip") {
+            inputFieldsDiv.innerHTML += `<label for="inputArray1">数组 1:</label>
+                                        <input type="text" id="inputArray1" value="1,2,3" placeholder="例如：1,2,3"><br><br>
+                                        <label for="inputArray2">数组 2:</label>
+                                        <input type="text" id="inputArray2" value="a,b,c" placeholder="例如：a,b,c">`;
+        } else if (selectedFunction === "filter") {
+            inputFieldsDiv.innerHTML += `<label for="inputArray1">数组:</label>
+                                        <input type="text" id="inputArray1" value="1,2,3,4,5" placeholder="例如：1,2,3,4,5"><br><br>
+                                        <label for="conditionInput">条件 (使用 d 作为元素):</label>
+                                        <input type="text" id="conditionInput" value="d > 2" placeholder="例如：d > 2">`;
+        } else if (selectedFunction === "map") {
+            inputFieldsDiv.innerHTML += `<label for="inputArray1">数组:</label>
+                                        <input type="text" id="inputArray1" value="1,2,3" placeholder="例如：1,2,3"><br><br>
+                                        <label for="operationInput">操作 (使用 d 作为元素):</label>
+                                        <input type="text" id="operationInput" value="d * 2" placeholder="例如：d * 2">`;
+        } else if (selectedFunction === "reduce") {
+            inputFieldsDiv.innerHTML += `<label for="inputArray1">数组:</label>
+                                        <input type="text" id="inputArray1" value="1,2,3" placeholder="例如：1,2,3"><br><br>
+                                        <label for="operationInput">操作 (使用 acc 和 val):</label>
+                                        <input type="text" id="operationInput" value="acc + val" placeholder="例如：acc + val"><br><br>
+                                        <label for="initialValue">初始值:</label>
+                                        <input type="text" id="initialValue" value="0" placeholder="例如：0">`;
+        }
+    }
+
+    function getInputArray(id) {
+        const input = document.getElementById(id).value.trim();
+        return input ? input.split(',').map(item => item.trim()) : [];
+    }
+
+    // 新增的解析函数，用于解析多个数组的输入
+    function getInputArrays(id) {
+        const input = document.getElementById(id).value.trim();
+        if (!input) return [];
+        // 匹配类似于 [1,2,3] 的数组
+        const arrayStrings = input.match(/\[([^\]]+)\]/g);
+        if (!arrayStrings) return [];
+        return arrayStrings.map(arrStr => arrStr.replace(/^\[|\]$/g, '').split(',').map(item => item.trim()));
+    }
+
+    function displayResult(method, content) {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = `<h2>${method}</h2><p>${content}</p>`;
+    }
+
+    function showResult() {
+        const selectedFunction = document.getElementById("functionSelect").value;
+        let array1, array2, arrays, result;
+
+        try {
+            switch (selectedFunction) {
+                case "cross":
+                    array1 = getInputArray("inputArray1");
+                    array2 = getInputArray("inputArray2");
+                    result = d3.cross(array1, array2);
+                    displayResult("d3.cross", `输入: [${array1}] 和 [${array2}]\n结果: ${JSON.stringify(result)}`);
+                    break;
+                case "merge":
+                    arrays = getInputArrays("inputArrays");
+                    result = d3.merge(arrays);
+                    displayResult("d3.merge", `输入: ${JSON.stringify(arrays)}\n结果: ${JSON.stringify(result)}`);
+                    break;
+                case "pairs":
+                    array1 = getInputArray("inputArray1");
+                    result = d3.pairs(array1);
+                    displayResult("d3.pairs", `输入: [${array1}]\n结果: ${JSON.stringify(result)}`);
+                    break;
+                case "transpose":
+                    array1 = getInputArray("inputArray1");
+                    array2 = getInputArray("inputArray2");
+                    result = d3.transpose([array1, array2]);
+                    displayResult("d3.transpose", `输入: ${JSON.stringify([array1, array2])}\n结果: ${JSON.stringify(result)}`);
+                    break;
+                case "zip":
+                    array1 = getInputArray("inputArray1");
+                    array2 = getInputArray("inputArray2");
+                    result = d3.zip(array1, array2);
+                    displayResult("d3.zip", `输入: [${array1}] 和 [${array2}]\n结果: ${JSON.stringify(result)}`);
+                    break;
+                case "filter":
+                    array1 = getInputArray("inputArray1").map(Number);
+                    const conditionStr = document.getElementById("conditionInput").value.trim();
+                    const conditionFunc = new Function('d', 'return ' + conditionStr);
+                    result = d3.filter(array1, conditionFunc);
+                    displayResult("d3.filter", `输入: [${array1}]\n条件: ${conditionStr}\n结果: ${JSON.stringify(result)}`);
+                    break;
+                case "map":
+                    array1 = getInputArray("inputArray1").map(Number);
+                    const operationStr = document.getElementById("operationInput").value.trim();
+                    const operationFunc = new Function('d', 'return ' + operationStr);
+                    result = d3.map(array1, operationFunc);
+                    displayResult("d3.map", `输入: [${array1}]\n操作: ${operationStr}\n结果: ${JSON.stringify(result)}`);
+                    break;
+                case "reduce":
+                    array1 = getInputArray("inputArray1").map(Number);
+                    const reduceOperationStr = document.getElementById("operationInput").value.trim();
+                    const initialValueStr = document.getElementById("initialValue").value.trim();
+                    const initialValue = initialValueStr ? Number(initialValueStr) : undefined;
+                    const reducerFunc = new Function('acc', 'val', 'return ' + reduceOperationStr);
+                    result = d3.reduce(array1, reducerFunc, initialValue);
+                    displayResult("d3.reduce", `输入: [${array1}]\n操作: ${reduceOperationStr}\n初始值: ${initialValue}\n结果: ${result}`);
+                    break;
+            }
+        } catch (error) {
+            displayResult("错误", `发生错误: ${error.message}`);
+        }
+    }
+
+    // 初始化默认输入框和示例输入
+    updateInputFields();
+</script>
+
+</body>
+</html>
